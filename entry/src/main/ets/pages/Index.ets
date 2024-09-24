@@ -1,9 +1,11 @@
-import { showToast } from '../component/dialog/toast/Toast';
-import { CustomStyleParms } from '../models/styles';
+import { CustomBorderStyleParms, PracticeStatus } from '../models/IndexPageModel';
 
 @Entry
 @Component
 struct Index {
+  // 练习的状态
+  @State practiceStatus: PracticeStatus = PracticeStatus.Stopped
+
   build() {
     RelativeContainer() {
       Column() {
@@ -50,22 +52,31 @@ struct Index {
         Row() {
           Button('结束测试')
             .bottomCommitButtonStyle(
-              new CustomStyleParms(Color.Transparent, Color.Gray, Color.Black)
+              new CustomBorderStyleParms(
+                Color.Transparent,
+                this.practiceStatus === PracticeStatus.Stopped ? Color.Gray : Color.Black,
+                this.practiceStatus === PracticeStatus.Stopped ? Color.Gray : Color.Black
+              )
             ).onClick(
             () => {
-              showToast('结束测试')
+              this.practiceStatus = PracticeStatus.Stopped
             }
           )
+            .enabled(this.practiceStatus !== PracticeStatus.Stopped)
 
           Button('开始测试')
             .margin({ left: 50 })
             .bottomCommitButtonStyle(
-              new CustomStyleParms(Color.Black, Color.Black, Color.White)
+              new CustomBorderStyleParms(
+                this.practiceStatus === PracticeStatus.Running ? '#555555' : Color.Black,
+                Color.White,
+                this.practiceStatus === PracticeStatus.Running ? '#555555' : Color.Black
+              )
             ).onClick(
             () => {
-              showToast('开始测试')
+              this.practiceStatus = PracticeStatus.Running
             }
-          )
+          ).enabled(this.practiceStatus !== PracticeStatus.Running)
         }
       }
       .practiceBgStyle()
@@ -124,7 +135,7 @@ function optionStyle() {
 }
 
 @Extend(Button)
-function bottomCommitButtonStyle(params: CustomStyleParms) {
+function bottomCommitButtonStyle(params: CustomBorderStyleParms) {
   .fontSize(16)
   .fontColor(params.fontColor)
   .backgroundColor(params.bg)
